@@ -4,11 +4,18 @@ import AudioSrc from "../assets/audio.mp3";
 import "./Controls.css";
 const Controls = () => {
   const [play, setPlay] = useState(false);
-  const [volumen, setVolumen] = useState(20);
+  const [mute,setMute] = useState(false)
+  const [volumen, setVolumen] = useState(0.3);
+  const [auxVolume, setAuxVolume] = useState(0);
   const [dur, setDur] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audio = useRef("audio_tag");
 
+  const handleVolume = (q) => {
+    console.log("volumen",q)
+    setVolumen(q);
+    audio.current.volume = q;
+  }
   const fmtMSS = (s) => {
     return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + ~~s;
   };
@@ -18,13 +25,22 @@ const Controls = () => {
     audio.current.currentTime = compute
   }
   
-  console.log(dur,currentTime,`audio -- ${audio.current.duration}`)
   const toggleAudio = () =>
     audio.current.paused ? audio.current.play() : audio.current.pause();
+    useEffect(() => {
+
+      if(volumen > 0 ){
+          setAuxVolume(volumen)
+      }
+      let aux = auxVolume
+      let valueVolumen = !mute ? aux:0;
+      handleVolume(valueVolumen)
+    },[mute]);
   return (
     <div className="Control">
       <div className="Control-item">
-        <FontAwesomeIcon style={{ marginRight: ".5rem" }} onClick={() => {  toggleAudio(); }} icon="play-circle" />
+      <FontAwesomeIcon style={{ marginRight: ".5rem" }} onClick={() => {  toggleAudio(); setPlay(!play)}} icon={!play?"play-circle":"pause"} />
+
         <span style={{ marginRight: ".5rem" }}>
           {fmtMSS(currentTime)}/ {fmtMSS(dur)}
         </span>
@@ -46,11 +62,16 @@ const Controls = () => {
         />
       </div>
       <div className="Control-item">
-        <FontAwesomeIcon style={{ marginRight: ".5rem" }} icon="volume-up" />
+        <FontAwesomeIcon 
+        onClick={()=>{
+          setMute(!mute)
+        
+          }} style={{ marginRight: ".5rem" }} icon={volumen <=0?"volume-mute":"volume-up"} />
         <input
           type="range"
           style={{ marginRight: ".5rem" }}
-          value={volumen}
+          value={Math.round(volumen * 100)} 
+          onChange={(e) => handleVolume(e.target.value / 100)}
           name=""
           id=""
         />
