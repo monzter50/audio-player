@@ -1,0 +1,9 @@
+.Control{
+    display: flex;
+    padding: 1rem;
+    align-items: center;
+}
+.Control-item{
+    display: flex;
+    align-items: center;
+}
